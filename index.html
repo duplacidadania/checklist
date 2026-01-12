@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checklist Cidadania - Dupla Cidadania</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        body { 
+            background-color: #f4f7f6; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .header-section {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+            border-bottom: 5px solid #fff;
+        }
+        .card { 
+            border-radius: 15px; 
+            border: none; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+        }
+        .checklist-item { 
+            transition: all 0.2s; 
+            border-left: 5px solid transparent;
+            background-color: #fff;
+        }
+        .checklist-item:hover { 
+            border-left: 5px solid #0d6efd; 
+            background-color: #f8f9ff;
+        }
+        .form-check-input { width: 1.2em; height: 1.2em; cursor: pointer; }
+        .form-check-input:checked + .form-check-label { 
+            text-decoration: line-through; 
+            color: #adb5bd; 
+        }
+        .cost-badge { 
+            font-size: 0.8rem; 
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+        .note-box {
+            border-left: 5px solid #ffc107;
+            background-color: #fffdf5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header-section text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold">Checklist de Cidadania</h1>
+        <p class="lead">Seu guia de documentos e custos estimados para o processo.</p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row justify-content-center mb-5">
+        <div class="col-md-5 mb-3">
+            <label class="form-label fw-bold text-secondary"><i class="bi bi-globe"></i> Nacionalidade:</label>
+            <select id="paisSelect" class="form-select form-select-lg shadow-sm" onchange="toggleVias()">
+                <option value="italiana">🇮🇹 Italiana</option>
+                <option value="alema">🇩🇪 Alemã</option>
+            </select>
+        </div>
+        <div id="viaContainer" class="col-md-5 mb-3">
+            <label class="form-label fw-bold text-secondary"><i class="bi bi-signpost-split"></i> Via do Processo:</label>
+            <select id="viaSelect" class="form-select form-select-lg shadow-sm" onchange="updateChecklist()">
+                <option value="consulado">Via Consulado (Brasil)</option>
+                <option value="judicial_br">Via Judicial (Contra a Fila / Materna)</option>
+                <option value="judicial_it">Via Administrativa (Morando na Itália)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card p-4 p-md-5">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 border-bottom pb-3">
+                    <h2 id="checklistTitle" class="h3 mb-2 mb-md-0">Documentação</h2>
+                    <span class="badge bg-dark">Referência Preços SC: 2026</span>
+                </div>
+                
+                <div id="checklistContent" class="list-group list-group-flush mb-4">
+                    </div>
+
+                <div id="obsItalia" class="note-box p-4 rounded shadow-sm d-none">
+                    <h5 class="text-warning-dark"><i class="bi bi-info-circle-fill"></i> Nota sobre Autonomia na Itália</h5>
+                    <p class="mb-0 small text-muted">
+                        Para o processo realizado diretamente em um <em>Comune</em> na Itália, a contratação de assessores ou advogados é <strong>estritamente opcional</strong>. 
+                        O requerente tem o direito legal de realizar todas as etapas sozinho. No entanto, isso exige domínio do idioma italiano e comunicação direta com os oficiais públicos.
+                    </p>
+                </div>
+
+                <div class="mt-5 p-3 bg-light rounded border">
+                    <h6 class="fw-bold"><i class="bi bi-calculator"></i> Base de Custos (Estimativa SC):</h6>
+                    <div class="row g-2 mt-2">
+                        <div class="col-md-4 small">• <strong>Apostila de Haia:</strong> ~R$ 68,00</div>
+                        <div class="col-md-4 small">• <strong>Inteiro Teor:</strong> ~R$ 75,00</div>
+                        <div class="col-md-4 small">• <strong>Tradução:</strong> R$ 120-180/pág</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center py-4 text-muted border-top bg-white">
+    <p>© 2026 Organização Dupla Cidadania - russi.github.io</p>
+</footer>
+
+<script>
+const data = {
+    italiana: {
+        consulado: [
+            { item: "Certidão de Nascimento do Antenato (Estratto di Nascita)", custo: "Gratuito (Comune)" },
+            { item: "Certidões da Linha Direta (Nasc/Cas/Óbito) em Inteiro Teor", custo: "R$ 150/cada (Doc+Apostila)" },
+            { item: "CNN (Certidão Negativa de Naturalização)", custo: "Grátis" },
+            { item: "Traduções Juramentadas para Italiano", custo: "R$ 130 - R$ 160" },
+            { item: "Taxa de Processamento Consular (300 Euros)", custo: "R$ 1.800 aprox." }
+        ],
+        judicial_br: [
+            { item: "Pasta de Documentos Completa (Apostilada e Traduzida)", custo: "R$ 4.000 - R$ 6.000" },
+            { item: "Procuração para Advogado na Itália (Apostilada)", custo: "R$ 220" },
+            { item: "Honorários Advocatícios (Obrigatório nesta via)", custo: "€ 3.500 - € 5.000" },
+            { item: "Custos de Notificação de Processo", custo: "€ 300" }
+        ],
+        judicial_it: [
+            { item: "Pasta de Documentos Completa (Brasil)", custo: "R$ 4.000+" },
+            { item: "Passagem Aérea e Seguro Saúde", custo: "R$ 5.500+" },
+            { item: "Aluguel de Imóvel e Contrato (Residência)", custo: "€ 600 - € 1.000/mês" },
+            { item: "Marca da Bollo (Selo para requerimento)", custo: "€ 16,00" },
+            { item: "Taxa de Permesso di Soggiorno (se exceder 90 dias)", custo: "€ 100" }
+        ]
+    },
+    alema: {
+        default: [
+            { item: "Certidão de Nascimento Alemã (Geburtsurkunde) do Antepassado", custo: "€ 15 - € 30" },
+            { item: "Certidões de Nascimento/Casamento de cada pessoa da linhagem", custo: "R$ 150/cada" },
+            { item: "CNN ou RNE do Antepassado Alemão emitida via GovBR", custo: "Grátis" },
+            { item: "Traduções Juramentadas para Alemão", custo: "R$ 160 - R$ 220" },
+            { item: "Formulários do BVA preenchidos (Anlage V / Anlage E)", custo: "Grátis" }
+        ]
+    }
+};
+
+function toggleVias() {
+    const pais = document.getElementById('paisSelect').value;
+    const viaContainer = document.getElementById('viaContainer');
+    if (pais === 'alema') {
+        viaContainer.style.visibility = 'hidden';
+    } else {
+        viaContainer.style.visibility = 'visible';
+    }
+    updateChecklist();
+}
+
+function updateChecklist() {
+    const pais = document.getElementById('paisSelect').value;
+    const via = document.getElementById('viaSelect').value;
+    const content = document.getElementById('checklistContent');
+    const title = document.getElementById('checklistTitle');
+    const obsItalia = document.getElementById('obsItalia');
+    
+    let items = (pais === 'italiana') ? data.italiana[via] : data.alema.default;
+    
+    // Atualiza o Título
+    title.innerHTML = `<i class="bi bi-check2-all text-success"></i> ${pais.charAt(0).toUpperCase() + pais.slice(1)}`;
+    
+    // Mostra/Esconde observação da Itália
+    if (pais === 'italiana' && via === 'judicial_it') {
+        obsItalia.classList.remove('d-none');
+    } else {
+        obsItalia.classList.add('d-none');
+    }
+
+    // Gera a lista
+    content.innerHTML = items.map((obj, index) => `
+        <div class="list-group-item checklist-item py-3 border-bottom">
+            <div class="form-check d-flex justify-content-between align-items-center">
+                <div>
+                    <input class="form-check-input me-3" type="checkbox" id="check-${index}">
+                    <label class="form-check-label fw-bold" for="check-${index}">
+                        ${obj.item}
+                    </label>
+                </div>
+                <span class="badge bg-success-subtle text-success border border-success cost-badge">
+                    Est: ${obj.custo}
+                </span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Inicialização
+window.onload = updateChecklist;
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
